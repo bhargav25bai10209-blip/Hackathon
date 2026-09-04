@@ -470,6 +470,66 @@ st.markdown(
         padding: 0.55rem 1.2rem;
     }}
 
+    .capture-button-wrapper {{
+        position: relative;
+        margin-bottom: 14px;
+    }}
+    
+    .capture-button-wrapper .stButton {{
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+    }}
+    
+    .capture-button-wrapper .stButton > button {{
+        width: 100%;
+        height: 100%;
+        min-height: 150px;
+        opacity: 0;
+        cursor: pointer;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }}
+    
+    .capture-button-wrapper .stButton > button:hover {{
+        border: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }}
+
+    /* ── Dual Capture buttons ─────────────────────────────────────────────── */
+
+    button[kind="secondary"] {{
+        min-height: 150px;
+        border-radius: 18px;
+        font-size: 1rem;
+        font-weight: 800;
+        white-space: pre-line;
+        line-height: 1.7;
+        padding: 20px;
+        transition: all 0.18s ease;
+    }}
+    
+    button[kind="secondary"]:hover {{
+        transform: translateY(-3px);
+        box-shadow: 0 14px 30px rgba(0, 43, 73, 0.18);
+    }}
+    
+    /* Camera card */
+    div[data-testid="column"]:first-child button[kind="secondary"] {{
+        background: #002B49;
+        color: #FFFFFF;
+        border: 1px solid #002B49;
+    }}
+    
+    /* Upload card */
+    div[data-testid="column"]:nth-child(2) button[kind="secondary"] {{
+        background: #1E5631;
+        color: #FFFFFF;
+        border: 1px solid #1E5631;
+    }}
+
     div[data-testid="stFormSubmitButton"] button {{
         border-radius: 12px;
         font-weight: 700;
@@ -703,60 +763,53 @@ Use your camera in the field or upload an existing photograph.
     captured_image = None
 
     with capture_col1:
-        st.markdown(
-            """
-    <div class="capture-option capture-camera">
-    <div class="capture-icon">📷</div>
-    <div class="capture-title">Take a Photo</div>
-    <div class="capture-desc">Capture the animal using your camera</div>
-    </div>
-    """,
-            unsafe_allow_html=True,
-        )
-    
         if not st.session_state.show_camera:
-    
-            if st.button("📷 Open Camera", key="open_camera", use_container_width=True):
+            if st.button(
+                "📷\nTake a Photo\nCapture the animal using your camera",
+                key="open_camera",
+                use_container_width=True,
+            ):
                 st.session_state.show_camera = True
                 st.session_state.show_upload = False
                 st.rerun()
-    
+        
         else:
-    
-            if st.button("✕ Close Camera", key="close_camera", use_container_width=True):
+        
+            if st.button(
+                "✕  Close Camera",
+                key="close_camera",
+                use_container_width=True,
+            ):
                 st.session_state.show_camera = False
                 st.rerun()
-    
+        
             cam_photo = st.camera_input(
                 "Take a photo",
                 label_visibility="collapsed"
             )
-    
+        
             if cam_photo is not None:
                 captured_image = cam_photo
 
     with capture_col2:
-        st.markdown(
-            """
-    <div class="capture-option capture-upload">
-    <div class="capture-icon">🖼️</div>
-    <div class="capture-title">Upload Photo</div>
-    <div class="capture-desc">Choose an existing cattle photograph</div>
-    </div>
-    """,
-            unsafe_allow_html=True,
-        )
-    
         if not st.session_state.show_upload:
     
-            if st.button("🖼️ Choose Photo", key="open_upload", use_container_width=True):
+            if st.button(
+                "🖼️\nUpload Photo\nChoose an existing cattle photograph",
+                key="open_upload",
+                use_container_width=True,
+            ):
                 st.session_state.show_upload = True
                 st.session_state.show_camera = False
                 st.rerun()
     
         else:
     
-            if st.button("✕ Close Upload", key="close_upload", use_container_width=True):
+            if st.button(
+                "✕  Close Upload",
+                key="close_upload",
+                use_container_width=True,
+            ):
                 st.session_state.show_upload = False
                 st.rerun()
     
@@ -768,6 +821,7 @@ Use your camera in the field or upload an existing photograph.
     
             if uploaded is not None:
                 captured_image = uploaded
+    
                 st.image(
                     uploaded,
                     caption="Uploaded field photo",

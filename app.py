@@ -643,7 +643,7 @@ st.markdown(
 with st.container():
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     c1, c2 = st.columns(2)    
-    with c3:
+    with c1:
         st.markdown('<div class="micro-label">State</div>', unsafe_allow_html=True)
     
         state = st.selectbox(
@@ -652,7 +652,7 @@ with st.container():
             label_visibility="collapsed"
         )
 
-    with c4:
+    with c2:
         st.markdown('<div class="micro-label">District</div>', unsafe_allow_html=True)
     
         district_options = STATE_DISTRICTS.get(state, [])

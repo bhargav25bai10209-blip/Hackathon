@@ -326,7 +326,7 @@ st.markdown(
 # ──────────────────────────────────────────────────────────────────────────
 # LIVE STATS BANNER
 # ──────────────────────────────────────────────────────────────────────────
-m1, m2, m3, m4 = st.columns(4)
+m1, m2, m3, m4 = st.columns(4)    #NEEDS TO BE CHANGED AFTER BACKEND!!!!!!!!
 metrics = [
     (m1, "📋", "Records in module", "124"),
     (m2, "🎯", "AI / Enumerator match", "87%"),
@@ -482,10 +482,20 @@ st.markdown(
 with st.container():
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     if st.session_state.predictions is None:
-        st.markdown(
-            '<div class="micro-label">Feature comparison will appear after analysis.</div>',
-            unsafe_allow_html=True,
-        )
+       st.markdown(
+    """
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">Reference comparison pending</div>
+        <div class="empty-desc">
+            Detected features and the matching standard breed plate
+            will appear here after AI analysis.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+    
     else:
         rc1, rc2 = st.columns([1.3, 1])
         with rc1:

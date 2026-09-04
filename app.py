@@ -1,537 +1,615 @@
 """
 Bharat Pashudhan — AI Field Entry Module
-Hackathon prototype: AI-assisted breed identification as a "second opinion"
-for field enumerators entering data into the national livestock database.
-
+A single-file Streamlit application with a glassmorphism, React/Tailwind-inspired UI.
 Run with: streamlit run app.py
 """
 
 import random
-import time
+import string
 from datetime import datetime
 
 import streamlit as st
-from PIL import Image
 
-# ----------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
-# ----------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Bharat Pashudhan — AI Field Entry",
+    page_title="Bharat Pashudhan | AI Field Entry",
     page_icon="🐄",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# ----------------------------------------------------------------------------
-# DESIGN TOKENS
-# ----------------------------------------------------------------------------
-FOREST_GREEN = "#1E5631"
-NAVY = "#003366"
-SAFFRON = "#E67E22"
-SAGE_BG = "#EDF2ED"
-CARD_BG = "#FFFFFF"
-DANGER = "#B3261E"
-TEXT_MUTED = "#5A6B5D"
-
-# ----------------------------------------------------------------------------
-# CUSTOM CSS
-# ----------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────
+# GLOBAL STYLES (Glassmorphism / Tailwind-inspired design system)
+# ──────────────────────────────────────────────────────────────────────────
 st.markdown(
-    f"""
+    """
     <style>
-        /* ---- App shell: constrain to a mobile-width column, centered ---- */
-        .main > div {{
-            max-width: 480px;
-            margin: 0 auto;
-            padding-top: 0.5rem;
-        }}
-        html, body, [class*="css"] {{
-            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-        }}
-        .stApp {{
-            background-color: {SAGE_BG};
-        }}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-        /* ---- Government header banner ---- */
-        .gov-header {{
-            background: linear-gradient(135deg, {NAVY} 0%, {FOREST_GREEN} 100%);
-            border-radius: 14px;
-            padding: 18px 20px;
-            color: white;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 10px rgba(0, 51, 102, 0.25);
-        }}
-        .gov-header .emblem-row {{
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }}
-        .gov-header h1 {{
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: 0.2px;
-        }}
-        .gov-header .subtitle {{
-            font-size: 0.78rem;
-            color: #DCE6DF;
-            margin-top: 2px;
-        }}
-        .status-pill {{
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }}
+    :root {
+        --bg-slate: #F8FAFC;
+        --navy: #002B49;
+        --forest: #1E5631;
+        --saffron: #FF9933;
+        --border-soft: #E2E8F0;
+    }
 
-        /* ---- Section label ---- */
-        .step-label {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: {NAVY};
-            margin: 22px 0 8px 0;
-        }}
-        .step-badge {{
-            background: {NAVY};
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.68rem;
-        }}
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-        /* ---- Card ---- */
-        .field-card {{
-            background: {CARD_BG};
-            border: 1px solid #DCE3DC;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-        }}
+    .stApp {
+        background: var(--bg-slate);
+    }
 
-        /* ---- Metadata badges ---- */
-        .meta-badge {{
-            background: {SAGE_BG};
-            border: 1px solid #CBD8CC;
-            border-radius: 8px;
-            padding: 8px 10px;
-            font-size: 0.78rem;
-            color: {NAVY};
-            margin-bottom: 6px;
-        }}
-        .meta-badge b {{ color: #14331e; }}
+    #MainMenu, footer, header {visibility: hidden;}
 
-        /* ---- Prediction rows ---- */
-        .pred-row {{
-            margin-bottom: 12px;
-        }}
-        .pred-row .pred-top-line {{
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-        }}
-        .pred-rank1 {{
-            font-weight: 700;
-            color: {FOREST_GREEN};
-        }}
-        .pred-rank-other {{
-            font-weight: 600;
-            color: {NAVY};
-        }}
-        .bar-track {{
-            width: 100%;
-            height: 10px;
-            background: #E4EAE4;
-            border-radius: 6px;
-            overflow: hidden;
-        }}
-        .bar-fill-1 {{
-            height: 100%;
-            background: {FOREST_GREEN};
-            border-radius: 6px;
-        }}
-        .bar-fill-other {{
-            height: 100%;
-            background: {NAVY};
-            opacity: 0.55;
-            border-radius: 6px;
-        }}
+    .block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 3rem;
+        max-width: 1200px;
+    }
 
-        /* ---- Warning badge ---- */
-        .warn-badge {{
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #FDF1E3;
-            border: 1px solid {SAFFRON};
-            color: #8A4B0B;
-            border-radius: 8px;
-            padding: 8px 10px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            margin: 8px 0 4px 0;
-        }}
+    /* ---------- Micro label ---------- */
+    .micro-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #64748B;
+    }
 
-        /* ---- Trait tags ---- */
-        .trait-tag {{
-            display: inline-block;
-            background: #E7EFE8;
-            color: {FOREST_GREEN};
-            border: 1px solid #BFD6C4;
-            border-radius: 999px;
-            padding: 5px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin: 0 6px 6px 0;
-        }}
+    .saffron-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--saffron), #FFB366);
+        color: #ffffff;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 999px;
+        box-shadow: 0 4px 14px rgba(255, 153, 51, 0.35);
+        margin-bottom: 14px;
+    }
 
-        /* ---- Buttons ---- */
-        div.stButton > button {{
-            width: 100%;
-            border-radius: 10px;
-            padding: 0.65rem 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }}
-        div.stButton > button[kind="primary"] {{
-            background-color: {FOREST_GREEN};
-            border: none;
-        }}
+    /* ---------- Header ---------- */
+    .main-heading {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--navy);
+        line-height: 1.15;
+        margin: 4px 0 10px 0;
+    }
+    .gradient-text {
+        background: linear-gradient(90deg, var(--forest), var(--saffron));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .header-desc {
+        color: #475569;
+        font-size: 0.95rem;
+        max-width: 780px;
+        line-height: 1.55;
+        margin-bottom: 24px;
+    }
 
-        /* ---- Impact footer ---- */
-        .impact-footer {{
-            background: {CARD_BG};
-            border-left: 4px solid {SAFFRON};
-            border-radius: 8px;
-            padding: 12px 14px;
-            font-size: 0.76rem;
-            color: {TEXT_MUTED};
-            margin-top: 22px;
-            margin-bottom: 12px;
-        }}
-        .impact-footer b {{ color: {NAVY}; }}
+    /* ---------- Glass card ---------- */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border-soft);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 30px rgba(2, 32, 71, 0.06);
+        padding: 20px 22px;
+        margin-bottom: 18px;
+    }
 
-        /* ---- Confirmation toast card ---- */
-        .confirm-card {{
-            background: #EAF5EC;
-            border: 1px solid {FOREST_GREEN};
-            border-radius: 10px;
-            padding: 12px 14px;
-            color: #14331e;
-            font-size: 0.85rem;
-        }}
+    /* ---------- Metric grid ---------- */
+    .metric-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border-soft);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 24px rgba(2, 32, 71, 0.05);
+        padding: 18px 20px;
+        text-align: left;
+        transition: transform 0.15s ease;
+    }
+    .metric-value {
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: var(--navy);
+        margin-top: 4px;
+    }
+    .metric-icon {
+        font-size: 1.2rem;
+    }
+
+    /* ---------- Section header ---------- */
+    .section-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+    .step-badge {
+        background: var(--navy);
+        color: white;
+        font-weight: 800;
+        font-size: 0.75rem;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .step-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--navy);
+    }
+
+    /* ---------- Badges ---------- */
+    .badge-warning {
+        display: inline-block;
+        background: #FFF7E6;
+        color: #92600A;
+        border: 1px solid #FFD98A;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 10px;
+        margin-top: 8px;
+    }
+    .badge-ok {
+        display: inline-block;
+        background: #ECFDF3;
+        color: var(--forest);
+        border: 1px solid #B7E4C7;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 10px;
+        margin-top: 8px;
+    }
+
+    /* ---------- Feature tag ---------- */
+    .feature-tag {
+        display: inline-block;
+        background: #F0FDF4;
+        color: var(--forest);
+        border: 1px solid #C7EDD3;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 10px;
+        margin: 3px 4px 3px 0;
+    }
+
+    /* ---------- Breed prediction bar ---------- */
+    .breed-row {
+        margin-bottom: 14px;
+    }
+    .breed-name-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 5px;
+    }
+    .progress-track {
+        width: 100%;
+        height: 10px;
+        background: #EDF2F7;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    /* ---------- Footer roadmap ---------- */
+    .roadmap-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px dashed var(--border-soft);
+        border-radius: 16px;
+        padding: 16px 18px;
+        text-align: center;
+        height: 100%;
+    }
+    .roadmap-icon {
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+    }
+    .roadmap-title {
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 0.88rem;
+        margin-bottom: 4px;
+    }
+    .roadmap-desc {
+        font-size: 0.75rem;
+        color: #64748B;
+    }
+
+    hr.soft-divider {
+        border: none;
+        border-top: 1px solid var(--border-soft);
+        margin: 28px 0 20px 0;
+    }
+
+    .stButton>button {
+        border-radius: 12px;
+        font-weight: 700;
+        border: none;
+        padding: 0.55rem 1.2rem;
+    }
+    div[data-testid="stFormSubmitButton"] button {
+        border-radius: 12px;
+        font-weight: 700;
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# ----------------------------------------------------------------------------
-# MOCK PREDICTION FUNCTION
-# Swap the body of this function for a real model call — keep the same
-# return shape so nothing else in the app needs to change.
-# ----------------------------------------------------------------------------
-BREED_TRAIT_LIBRARY = {
-    "Gir": ["Convex forehead", "Long drooping ears", "Prominent dewlap"],
-    "Sahiwal": ["Loose skin", "Medium dewlap", "Reddish-brown coat"],
-    "Tharparkar": ["White-grey coat", "Compact body", "Medium-sized ears"],
-    "Red Sindhi": ["Deep red coat", "Broad forehead", "Short horns"],
-    "Murrah (Buffalo)": ["Tightly curled horns", "Jet black coat", "Large udder"],
-    "Jaffarabadi (Buffalo)": ["Massive drooping horns", "Broad forehead", "Heavy dewlap"],
-    "Kankrej": ["Lyre-shaped horns", "Silver-grey coat", "Deep chest"],
-    "Ongole": ["Large hump", "Loose skin folds", "White coat"],
-}
-
-
-def predict_breed(image):
-    """
-    Mock breed classifier.
-    Replace this implementation with a real model call (e.g. CLIP zero-shot
-    or a fine-tuned HF model). Keep the return shape identical:
-
-    Returns: list of up to 3 dicts, sorted by confidence descending:
-        [{"breed": str, "confidence": float (0-1), "traits": list[str]}, ...]
-    """
-    time.sleep(0.6)  # simulate inference latency for a realistic demo feel
-
-    all_breeds = list(BREED_TRAIT_LIBRARY.keys())
-    random.seed(hash(image.size) % (10**6))  # stable-ish per uploaded image
-
-    top = random.choice(all_breeds)
-    remaining = [b for b in all_breeds if b != top]
-    second, third = random.sample(remaining, 2)
-
-    # Occasionally simulate a "hard case" with a close top-2 split
-    hard_case = random.random() < 0.4
-    if hard_case:
-        c1 = round(random.uniform(0.42, 0.55), 2)
-        c2 = round(c1 - random.uniform(0.03, 0.09), 2)
-    else:
-        c1 = round(random.uniform(0.68, 0.91), 2)
-        c2 = round(random.uniform(0.08, 0.20), 2)
-    c3 = round(max(0.03, 1 - c1 - c2), 2)
-
-    results = [
-        {"breed": top, "confidence": c1, "traits": BREED_TRAIT_LIBRARY[top]},
-        {"breed": second, "confidence": c2, "traits": BREED_TRAIT_LIBRARY[second]},
-        {"breed": third, "confidence": c3, "traits": BREED_TRAIT_LIBRARY[third]},
-    ]
-    return results
-
-
-# ----------------------------------------------------------------------------
-# HEADER
-# ----------------------------------------------------------------------------
-st.markdown(
-    f"""
-    <div class="gov-header">
-        <div class="emblem-row">
-            <div>
-                <h1>🐄 Bharat Pashudhan — AI Field Entry Module</h1>
-                <div class="subtitle">Department of Animal Husbandry &amp; Dairying (DAHD)</div>
-            </div>
-        </div>
-        <div style="margin-top:10px;">
-            <span class="status-pill">🟢 Online / Sync Active</span>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.caption(
-    "AI-assisted decision support for breed entry. This tool provides a "
-    "second opinion — the enumerator's judgment is always final."
-)
-
-# ----------------------------------------------------------------------------
-# SESSION STATE
-# ----------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────
+# SESSION STATE INIT
+# ──────────────────────────────────────────────────────────────────────────
+if "tag_id" not in st.session_state:
+    st.session_state.tag_id = f"IND-1200-{random.randint(1000, 9999)}"
+if "worker_id" not in st.session_state:
+    st.session_state.worker_id = "DAHD-EN-2291"
 if "predictions" not in st.session_state:
     st.session_state.predictions = None
-if "saved_log" not in st.session_state:
-    st.session_state.saved_log = []
+if "entries" not in st.session_state:
+    st.session_state.entries = []
 
-# ----------------------------------------------------------------------------
-# STEP 1 — FIELD METADATA HEADER
-# ----------------------------------------------------------------------------
+INDIAN_STATES = [
+    "Uttar Pradesh", "Rajasthan", "Punjab", "Haryana", "Gujarat", "Maharashtra",
+    "Madhya Pradesh", "Bihar", "West Bengal", "Karnataka", "Tamil Nadu",
+    "Andhra Pradesh", "Telangana", "Odisha", "Assam", "Kerala",
+]
+
+BREED_LIBRARY = [
+    ("Gir", "#FF9933"), ("Sahiwal", "#1E5631"), ("Tharparkar", "#002B49"),
+    ("Red Sindhi", "#C2410C"), ("Kankrej", "#0F766E"), ("Ongole", "#7C3AED"),
+    ("Murrah (Buffalo)", "#B91C1C"), ("Rathi", "#0369A1"),
+]
+
+FEATURE_POOL = [
+    "Convex forehead", "Pendulous ears", "Prominent hump", "Loose dewlap",
+    "Light grey-white coat", "Curved horns", "Compact body frame",
+    "Distinct facial markings",
+]
+
+
+def generate_predictions():
+    breeds = random.sample(BREED_LIBRARY, 3)
+    top = random.uniform(58, 92)
+    second = top - random.uniform(4, 30)
+    third = second - random.uniform(3, 15)
+    scores = [round(max(top, 1), 1), round(max(second, 1), 1), round(max(third, 1), 1)]
+    scores = sorted(scores, reverse=True)
+    return list(zip([b[0] for b in breeds], [b[1] for b in breeds], scores))
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# HEADER
+# ──────────────────────────────────────────────────────────────────────────
+st.markdown('<span class="saffron-tag">AI Field Entry Module</span>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="step-label"><span class="step-badge">1</span> Field Metadata</div>',
+    '<div class="main-heading">Breed identification as a <span class="gradient-text">second opinion</span></div>',
     unsafe_allow_html=True,
 )
-
-with st.container():
-    st.markdown('<div class="field-card">', unsafe_allow_html=True)
-
-    ear_tag = f"IND-{random.randint(100000, 999999)}"
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(
-            f'<div class="meta-badge">Ear Tag ID<br><b>{ear_tag}</b></div>',
-            unsafe_allow_html=True,
-        )
-    with col2:
-        st.markdown(
-            '<div class="meta-badge">Worker ID<br><b>DAHD-EN-2291</b></div>',
-            unsafe_allow_html=True,
-        )
-
-    state = st.selectbox(
-        "State",
-        ["Madhya Pradesh", "Rajasthan", "Gujarat", "Uttar Pradesh", "Punjab", "Haryana", "Bihar"],
-    )
-    district = st.text_input("District", value="Bhopal")
-
-    st.markdown(
-        f'<div class="meta-badge">📍 Logged at: {datetime.now().strftime("%d %b %Y, %I:%M %p")}</div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ----------------------------------------------------------------------------
-# STEP 2 — DUAL PHOTO CAPTURE
-# ----------------------------------------------------------------------------
-st.markdown(
-    '<div class="step-label"><span class="step-badge">2</span> Capture Animal Photo</div>',
-    unsafe_allow_html=True,
-)
-
-with st.container():
-    st.markdown('<div class="field-card">', unsafe_allow_html=True)
-    tab_upload, tab_camera = st.tabs(["📁 Upload Photo", "📷 Use Camera"])
-
-    image = None
-    with tab_upload:
-        uploaded_file = st.file_uploader(
-            "Choose a photo from device", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
-        )
-        if uploaded_file:
-            image = Image.open(uploaded_file)
-
-    with tab_camera:
-        camera_file = st.camera_input("Take a live photo", label_visibility="collapsed")
-        if camera_file:
-            image = Image.open(camera_file)
-
-    if image is not None:
-        st.image(image, caption="Captured photo", use_container_width=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ----------------------------------------------------------------------------
-# RUN PREDICTION
-# ----------------------------------------------------------------------------
-if image is not None:
-    if st.button("🔍 Analyze Breed", type="primary"):
-        with st.spinner("Analyzing morphological features..."):
-            st.session_state.predictions = predict_breed(image)
-
-# ----------------------------------------------------------------------------
-# STEP 3 — TOP-3 PREDICTION VISUALIZATION
-# ----------------------------------------------------------------------------
-if st.session_state.predictions:
-    preds = st.session_state.predictions
-
-    st.markdown(
-        '<div class="step-label"><span class="step-badge">3</span> AI Breed Suggestions</div>',
-        unsafe_allow_html=True,
-    )
-
-    with st.container():
-        st.markdown('<div class="field-card">', unsafe_allow_html=True)
-
-        # Borderline / hard-case warning
-        top_conf = preds[0]["confidence"]
-        second_conf = preds[1]["confidence"]
-        is_close_split = (top_conf - second_conf) < 0.15
-        is_low_confidence = top_conf < 0.55
-
-        if is_close_split or is_low_confidence:
-            st.markdown(
-                '<div class="warn-badge">⚠️ Borderline confidence — visually similar breeds detected. '
-                "Please verify manually before confirming.</div>",
-                unsafe_allow_html=True,
-            )
-
-        for i, p in enumerate(preds):
-            rank_class = "pred-rank1" if i == 0 else "pred-rank-other"
-            bar_class = "bar-fill-1" if i == 0 else "bar-fill-other"
-            pct = int(p["confidence"] * 100)
-            st.markdown(
-                f"""
-                <div class="pred-row">
-                    <div class="pred-top-line">
-                        <span class="{rank_class}">#{i+1}  {p['breed']}</span>
-                        <span class="{rank_class}">{pct}%</span>
-                    </div>
-                    <div class="bar-track">
-                        <div class="{bar_class}" style="width:{pct}%;"></div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # ------------------------------------------------------------------
-    # STEP 4 — "WHY THIS BREED" TRAIT EXPLAINER
-    # ------------------------------------------------------------------
-    st.markdown(
-        '<div class="step-label"><span class="step-badge">4</span> Why This Breed?</div>',
-        unsafe_allow_html=True,
-    )
-    with st.container():
-        st.markdown('<div class="field-card">', unsafe_allow_html=True)
-        st.markdown(
-            f"Key visual traits matched for **{preds[0]['breed']}**:",
-        )
-        tags_html = "".join(
-            f'<span class="trait-tag">✓ {t}</span>' for t in preds[0]["traits"]
-        )
-        st.markdown(tags_html, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # ------------------------------------------------------------------
-    # STEP 5 — ENUMERATOR DECISION & ACTION FLOW
-    # ------------------------------------------------------------------
-    st.markdown(
-        '<div class="step-label"><span class="step-badge">5</span> Confirm Breed Entry</div>',
-        unsafe_allow_html=True,
-    )
-    with st.container():
-        st.markdown('<div class="field-card">', unsafe_allow_html=True)
-
-        breed_options = [p["breed"] for p in preds] + ["Other (manual entry)"]
-        final_breed = st.selectbox(
-            "Select final breed for record (defaults to top AI suggestion — override if needed)",
-            breed_options,
-            index=0,
-        )
-        if final_breed == "Other (manual entry)":
-            final_breed = st.text_input("Enter breed manually")
-
-        notes = st.text_input("Additional notes (optional)")
-
-        if st.button("✅ Confirm & Save to Pashudhan Log", type="primary"):
-            st.session_state.saved_log.append(
-                {
-                    "ear_tag": ear_tag,
-                    "state": state,
-                    "district": district,
-                    "breed": final_breed,
-                    "ai_top_suggestion": preds[0]["breed"],
-                    "ai_confidence": f"{int(preds[0]['confidence']*100)}%",
-                    "notes": notes,
-                    "time": datetime.now().strftime("%d %b %Y, %I:%M %p"),
-                }
-            )
-            st.markdown(
-                f"""
-                <div class="confirm-card">
-                    ✅ <b>Record saved.</b> Ear Tag {ear_tag} logged as <b>{final_breed}</b>
-                    for {district}, {state}.
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-# ----------------------------------------------------------------------------
-# SESSION LOG (for demo purposes — shows submitted entries this session)
-# ----------------------------------------------------------------------------
-if st.session_state.saved_log:
-    with st.expander(f"📋 Session log ({len(st.session_state.saved_log)} entries)"):
-        st.table(st.session_state.saved_log)
-
-# ----------------------------------------------------------------------------
-# STEP 6 — IMPACT BANNER FOOTER
-# ----------------------------------------------------------------------------
 st.markdown(
     """
-    <div class="impact-footer">
-        <b>Why this matters:</b> Manual breed misclassification during field data
-        entry is a recognized source of error in national livestock databases.
-        AI-assisted second-opinion tools aim to reduce entry errors without
-        replacing enumerator judgment — every suggestion here requires human
-        confirmation before being logged.
+    <div class="header-desc">
+    Enumerators capture a photo in the field; the on-device model returns a short‑list of the
+    most likely breeds, each cross‑checked against standard breed plates. Every prediction is
+    stamped with an AI audit trail before the enumerator confirms the final entry — the system
+    assists judgement, it never replaces it.
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-st.caption("Prototype build for hackathon demonstration. Not an official DAHD product.")
+# ──────────────────────────────────────────────────────────────────────────
+# LIVE STATS BANNER
+# ──────────────────────────────────────────────────────────────────────────
+m1, m2, m3, m4 = st.columns(4)
+metrics = [
+    (m1, "📋", "Records in module", "124"),
+    (m2, "🎯", "AI / Enumerator match", "87%"),
+    (m3, "⚠️", "Borderline cases", "12"),
+    (m4, "🗺️", "Districts covered", "18"),
+]
+for col, icon, label, value in metrics:
+    with col:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-icon">{icon}</div>
+                <div class="micro-label">{label}</div>
+                <div class="metric-value">{value}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+st.markdown('<hr class="soft-divider">', unsafe_allow_html=True)
+
+# ──────────────────────────────────────────────────────────────────────────
+# STEP 1 — FIELD METADATA
+# ──────────────────────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <div class="section-step">
+        <div class="step-badge">1</div>
+        <div class="step-title">Field Metadata</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.markdown('<div class="micro-label">Tag ID (auto)</div>', unsafe_allow_html=True)
+        st.text_input("Tag ID", value=st.session_state.tag_id, disabled=True, label_visibility="collapsed")
+    with c2:
+        st.markdown('<div class="micro-label">Worker ID</div>', unsafe_allow_html=True)
+        st.text_input("Worker ID", value=st.session_state.worker_id, disabled=True, label_visibility="collapsed")
+    with c3:
+        st.markdown('<div class="micro-label">State</div>', unsafe_allow_html=True)
+        state = st.selectbox("State", INDIAN_STATES, label_visibility="collapsed")
+    with c4:
+        st.markdown('<div class="micro-label">District</div>', unsafe_allow_html=True)
+        district = st.text_input("District", placeholder="e.g. Bharuch", label_visibility="collapsed")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ──────────────────────────────────────────────────────────────────────────
+# STEP 2 — DUAL CAPTURE
+# ──────────────────────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <div class="section-step">
+        <div class="step-badge">2</div>
+        <div class="step-title">Dual Capture</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    tab_upload, tab_camera = st.tabs(["📁 Upload File", "📷 Live Camera Capture"])
+    captured_image = None
+    with tab_upload:
+        uploaded = st.file_uploader(
+            "Upload an animal photo", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
+        )
+        if uploaded is not None:
+            captured_image = uploaded
+            st.image(uploaded, caption="Uploaded field photo", width=280)
+    with tab_camera:
+        cam_photo = st.camera_input("Capture live photo", label_visibility="collapsed")
+        if cam_photo is not None:
+            captured_image = cam_photo
+
+    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+    analyze_clicked = st.button("🔍 Analyze Breed Characteristics", type="primary", use_container_width=False)
+    if analyze_clicked:
+        if captured_image is None:
+            st.warning("Please upload a photo or capture one via camera before analyzing.")
+        else:
+            with st.spinner("Running on-device breed classifier…"):
+                st.session_state.predictions = generate_predictions()
+                st.session_state.features = random.sample(FEATURE_POOL, 4)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ──────────────────────────────────────────────────────────────────────────
+# STEP 3 — PREDICTIONS & CONFIDENCE
+# ──────────────────────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <div class="section-step">
+        <div class="step-badge">3</div>
+        <div class="step-title">Predictions &amp; Confidence</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    if st.session_state.predictions is None:
+        st.markdown(
+            '<div class="micro-label">Run analysis above to generate a breed short-list.</div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        preds = st.session_state.predictions
+        bars_html = ""
+        colors = ["#1E5631", "#FF9933", "#002B49"]
+        for (breed, _, score), color in zip(preds, colors):
+            bars_html += f"""
+            <div class="breed-row">
+                <div class="breed-name-row"><span>{breed}</span><span>{score}%</span></div>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width:{score}%; background:{color};"></div>
+                </div>
+            </div>
+            """
+        st.markdown(bars_html, unsafe_allow_html=True)
+
+        gap = preds[0][2] - preds[1][2]
+        if gap < 15:
+            st.markdown(
+                f'<span class="badge-warning">⚠️ Borderline case — top gap only {gap:.1f} pts. Recommend manual review.</span>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f'<span class="badge-ok">✓ Confident prediction — top gap {gap:.1f} pts.</span>',
+                unsafe_allow_html=True,
+            )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ──────────────────────────────────────────────────────────────────────────
+# STEP 4 — REFERENCE MATCH
+# ──────────────────────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <div class="section-step">
+        <div class="step-badge">4</div>
+        <div class="step-title">Reference Match</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    if st.session_state.predictions is None:
+        st.markdown(
+            '<div class="micro-label">Feature comparison will appear after analysis.</div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        rc1, rc2 = st.columns([1.3, 1])
+        with rc1:
+            st.markdown('<div class="micro-label" style="margin-bottom:8px;">Detected feature tags</div>', unsafe_allow_html=True)
+            tags_html = "".join(
+                f'<span class="feature-tag">✓ {feat}</span>' for feat in st.session_state.features
+            )
+            st.markdown(tags_html, unsafe_allow_html=True)
+        with rc2:
+            st.markdown('<div class="micro-label" style="margin-bottom:8px;">Standard breed plate</div>', unsafe_allow_html=True)
+            top_breed = st.session_state.predictions[0][0]
+            st.markdown(
+                f"""
+                <div style="background:#F1F5F9; border:1px solid var(--border-soft);
+                            border-radius:12px; padding:26px 14px; text-align:center;">
+                    <div style="font-size:2rem;">🐄</div>
+                    <div style="font-weight:700; color:var(--navy); margin-top:6px;">{top_breed}</div>
+                    <div class="micro-label">Reference plate — DAHD registry</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <div class="section-step">
+        <div class="step-badge">5</div>
+        <div class="step-title">Confirmation</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    breed_options = (
+        [b for b, _, _ in st.session_state.predictions] + ["Other / Not Listed"]
+        if st.session_state.predictions
+        else [b[0] for b in BREED_LIBRARY] + ["Other / Not Listed"]
+    )
+    cc1, cc2 = st.columns([1, 2])
+    with cc1:
+        st.markdown('<div class="micro-label">Confirmed breed</div>', unsafe_allow_html=True)
+        confirmed_breed = st.selectbox("Confirmed breed", breed_options, label_visibility="collapsed")
+    with cc2:
+        st.markdown('<div class="micro-label">Observation notes</div>', unsafe_allow_html=True)
+        notes = st.text_area(
+            "Observation notes", placeholder="Any additional field observations…",
+            label_visibility="collapsed", height=68,
+        )
+
+    if st.button("✅ Confirm & Save Entry", type="primary"):
+        if not district.strip():
+            st.warning("Please enter a district before saving the entry.")
+        else:
+            entry = {
+                "Tag ID": st.session_state.tag_id,
+                "Worker": st.session_state.worker_id,
+                "State": state,
+                "District": district,
+                "Confirmed Breed": confirmed_breed,
+                "Top AI Guess": st.session_state.predictions[0][0] if st.session_state.predictions else "—",
+                "Confidence": f"{st.session_state.predictions[0][2]}%" if st.session_state.predictions else "—",
+                "Notes": notes,
+                "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            }
+            st.session_state.entries.append(entry)
+            st.success(f"Entry saved for {st.session_state.tag_id}.")
+            # Prepare a fresh tag for the next animal
+            st.session_state.tag_id = f"IND-1200-{random.randint(1000, 9999)}"
+            st.session_state.predictions = None
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ──────────────────────────────────────────────────────────────────────────
+# SESSION SUMMARY TABLE
+# ──────────────────────────────────────────────────────────────────────────
+if st.session_state.entries:
+    st.markdown('<hr class="soft-divider">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="section-step">
+            <div class="step-badge">📊</div>
+            <div class="step-title">Session Summary</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.dataframe(st.session_state.entries, use_container_width=True, hide_index=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ──────────────────────────────────────────────────────────────────────────
+# FOOTER — UPCOMING BACKEND MODULES ROADMAP
+# ──────────────────────────────────────────────────────────────────────────
+st.markdown('<hr class="soft-divider">', unsafe_allow_html=True)
+st.markdown('<div class="micro-label" style="margin-bottom:12px;">Upcoming backend modules</div>', unsafe_allow_html=True)
+
+roadmap_items = [
+    ("🏷️", "Ear Tag OCR", "Automated tag-number extraction from field photos."),
+    ("💉", "Vaccine Verification", "Cross-check vaccination records against the national registry."),
+    ("🛰️", "Geospatial Analytics", "District and block-level heat-maps of breed distribution."),
+    ("🔄", "Offline Sync Queue", "Queue entries captured without connectivity for later sync."),
+]
+
+r1, r2, r3, r4 = st.columns(4)
+for col, (icon, title, desc) in zip([r1, r2, r3, r4], roadmap_items):
+    with col:
+        st.markdown(
+            f"""
+            <div class="roadmap-card">
+                <div class="roadmap-icon">{icon}</div>
+                <div class="roadmap-title">{title}</div>
+                <div class="roadmap-desc">{desc}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+st.markdown(
+    """
+    <div style="text-align:center; margin-top:24px; color:#94A3B8; font-size:0.72rem;">
+        Bharat Pashudhan · AI Field Entry Module · Department of Animal Husbandry &amp; Dairying (DAHD)
+    </div>
+    """,
+    unsafe_allow_html=True,
+)

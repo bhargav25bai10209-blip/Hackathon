@@ -145,7 +145,7 @@ st.markdown(
         color: rgba(255,255,255,0.88);
     }}
 
-    /* ---------- Old header styles ---------- */
+    /* ---------- header styles ---------- */
     .main-heading {{
         font-size: 2.4rem;
         font-weight: 800;
@@ -182,6 +182,63 @@ st.markdown(
     }}
 
     /* ---------- Colorful capture card ---------- */
+
+    /* ---------- Dual Capture Actions ---------- */
+
+    .capture-option {{
+        border-radius: 18px;
+        padding: 24px 22px;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+        box-shadow: 0 10px 25px rgba(0, 43, 73, 0.14);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        margin-bottom: 14px;
+    }}
+    
+    .capture-option:hover {{
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px rgba(0, 43, 73, 0.18);
+    }}
+    
+    .capture-camera {{
+        background: linear-gradient(145deg, #002B49, #06496F);
+    }}
+    
+    .capture-upload {{
+        background: linear-gradient(145deg, #1E5631, #2D7545);
+    }}
+    
+    .capture-icon {{
+        font-size: 2.5rem;
+        line-height: 1;
+        margin-bottom: 12px;
+    }}
+    
+    .capture-title {{
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }}
+    
+    .capture-desc {{
+        font-size: 0.76rem;
+        opacity: 0.82;
+        line-height: 1.4;
+    }}
+    
+    .capture-label {{
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #64748B;
+        margin-bottom: 10px;
+    }}
     .capture-card {{
         background:
             radial-gradient(
@@ -435,11 +492,92 @@ if "predictions" not in st.session_state:
 if "entries" not in st.session_state:
     st.session_state.entries = []
 
-INDIAN_STATES = [
-    "Uttar Pradesh", "Rajasthan", "Punjab", "Haryana", "Gujarat", "Maharashtra",
-    "Madhya Pradesh", "Bihar", "West Bengal", "Karnataka", "Tamil Nadu",
-    "Andhra Pradesh", "Telangana", "Odisha", "Assam", "Kerala",
-]
+STATE_DISTRICTS = {
+    "Uttar Pradesh": [
+        "Agra", "Aligarh", "Ayodhya", "Bareilly", "Ghaziabad",
+        "Gorakhpur", "Jhansi", "Kanpur Nagar", "Lucknow",
+        "Mathura", "Meerut", "Prayagraj", "Varanasi"
+    ],
+
+    "Rajasthan": [
+        "Ajmer", "Alwar", "Bharatpur", "Bikaner", "Jaipur",
+        "Jaisalmer", "Jodhpur", "Kota", "Udaipur"
+    ],
+
+    "Punjab": [
+        "Amritsar", "Bathinda", "Firozpur", "Gurdaspur",
+        "Jalandhar", "Ludhiana", "Patiala", "Sangrur"
+    ],
+
+    "Haryana": [
+        "Ambala", "Bhiwani", "Faridabad", "Gurugram",
+        "Hisar", "Karnal", "Panipat", "Rohtak", "Sonipat"
+    ],
+
+    "Gujarat": [
+        "Ahmedabad", "Amreli", "Anand", "Bharuch", "Bhavnagar",
+        "Jamnagar", "Junagadh", "Kutch", "Mehsana",
+        "Rajkot", "Surat", "Vadodara"
+    ],
+
+    "Maharashtra": [
+        "Ahmednagar", "Akola", "Amravati", "Aurangabad",
+        "Nagpur", "Nashik", "Pune", "Satara", "Solapur"
+    ],
+
+    "Madhya Pradesh": [
+        "Bhopal", "Dewas", "Gwalior", "Indore", "Jabalpur",
+        "Khandwa", "Ratlam", "Rewa", "Sagar", "Ujjain"
+    ],
+
+    "Bihar": [
+        "Bhagalpur", "Darbhanga", "Gaya", "Muzaffarpur",
+        "Patna", "Purnia", "Saran", "Vaishali"
+    ],
+
+    "West Bengal": [
+        "Bankura", "Bardhaman", "Hooghly", "Howrah",
+        "Jalpaiguri", "Kolkata", "Malda", "Murshidabad"
+    ],
+
+    "Karnataka": [
+        "Bangalore Urban", "Belagavi", "Bellary", "Dharwad",
+        "Hassan", "Mysuru", "Shivamogga", "Tumakuru"
+    ],
+
+    "Tamil Nadu": [
+        "Chennai", "Coimbatore", "Madurai", "Salem",
+        "Thanjavur", "Tiruchirappalli", "Tirunelveli", "Vellore"
+    ],
+
+    "Andhra Pradesh": [
+        "Anantapur", "Chittoor", "Guntur", "Kurnool",
+        "Nellore", "Prakasam", "Srikakulam", "Visakhapatnam"
+    ],
+
+    "Telangana": [
+        "Adilabad", "Hyderabad", "Karimnagar", "Khammam",
+        "Mahbubnagar", "Medak", "Nalgonda", "Nizamabad", "Warangal"
+    ],
+
+    "Odisha": [
+        "Angul", "Balasore", "Cuttack", "Ganjam",
+        "Khordha", "Koraput", "Mayurbhanj", "Puri", "Sambalpur"
+    ],
+
+    "Assam": [
+        "Cachar", "Dibrugarh", "Jorhat", "Kamrup",
+        "Lakhimpur", "Nagaon", "Sivasagar", "Sonitpur"
+    ],
+
+    "Kerala": [
+        "Alappuzha", "Ernakulam", "Idukki", "Kannur",
+        "Kollam", "Kottayam", "Kozhikode", "Malappuram",
+        "Palakkad", "Thiruvananthapuram", "Thrissur"
+    ],
+}
+
+INDIAN_STATES = list(STATE_DISTRICTS.keys())
 
 BREED_LIBRARY = [
     ("Gir", "#FF9933"), ("Sahiwal", "#1E5631"), ("Tharparkar", "#002B49"),
@@ -505,13 +643,25 @@ st.markdown(
 with st.container():
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     c1, c2 = st.columns(2)    
-    with c1:
+    with c3:
         st.markdown('<div class="micro-label">State</div>', unsafe_allow_html=True)
-        state = st.selectbox("State", INDIAN_STATES, label_visibility="collapsed")
-    with c2:
+    
+        state = st.selectbox(
+            "State",
+            INDIAN_STATES,
+            label_visibility="collapsed"
+        )
+
+    with c4:
         st.markdown('<div class="micro-label">District</div>', unsafe_allow_html=True)
-        district = st.text_input("District", placeholder="e.g. Bharuch", label_visibility="collapsed")
-    st.markdown("</div>", unsafe_allow_html=True)
+    
+        district_options = STATE_DISTRICTS.get(state, [])
+    
+        district = st.selectbox(
+            "District",
+            district_options,
+            label_visibility="collapsed"
+        )
 
 # ──────────────────────────────────────────────────────────────────────────
 # STEP 2 — DUAL CAPTURE
@@ -528,20 +678,73 @@ st.markdown(
 
 with st.container():
     st.markdown('<div class="glass-card capture-card">', unsafe_allow_html=True)
-    tab_upload, tab_camera = st.tabs(["📁 Upload File", "📷 Live Camera Capture"])
+
+    st.markdown(
+        """
+<div style="text-align:center; margin-bottom:20px;">
+<div class="micro-label">Choose your input method</div>
+<div style="font-size:1.35rem; font-weight:800; color:#002B49; margin-top:5px;">
+Capture the animal photograph
+</div>
+<div style="font-size:0.82rem; color:#64748B; margin-top:4px;">
+Use your camera in the field or upload an existing photograph.
+</div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    capture_col1, capture_col2 = st.columns(2, gap="large")
+
     captured_image = None
-    with tab_upload:
-        uploaded = st.file_uploader(
-            "Upload an animal photo", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
+
+    with capture_col1:
+        st.markdown(
+            """
+<div class="capture-option capture-camera">
+<div class="capture-icon">📷</div>
+<div class="capture-title">Live Camera</div>
+<div class="capture-desc">Take a photograph of the animal now</div>
+</div>
+""",
+            unsafe_allow_html=True,
         )
-        if uploaded is not None:
-            captured_image = uploaded
-            st.image(uploaded, caption="Uploaded field photo", width=280)
-    with tab_camera:
-        cam_photo = st.camera_input("Capture live photo", label_visibility="collapsed")
+
+        cam_photo = st.camera_input(
+            "Capture live photo",
+            label_visibility="collapsed"
+        )
+
         if cam_photo is not None:
             captured_image = cam_photo
 
+    with capture_col2:
+        st.markdown(
+            """
+<div class="capture-option capture-upload">
+<div class="capture-icon">🖼️</div>
+<div class="capture-title">Upload Photo</div>
+<div class="capture-desc">Choose an existing cattle photograph</div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+        uploaded = st.file_uploader(
+            "Upload an animal photo",
+            type=["jpg", "jpeg", "png"],
+            label_visibility="collapsed"
+        )
+
+        if uploaded is not None:
+            captured_image = uploaded
+            st.image(
+                uploaded,
+                caption="Uploaded field photo",
+                width=280
+            )
+
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
     analyze_clicked = st.button("🔍 Analyze Breed Characteristics", type="primary", use_container_width=False)
     if analyze_clicked:
@@ -726,12 +929,3 @@ if st.session_state.entries:
 # ──────────────────────────────────────────────────────────────────────────
 # FOOTER — UPCOMING BACKEND MODULES ROADMAP
 # ──────────────────────────────────────────────────────────────────────────
-
-st.markdown(
-    """
-    <div style="text-align:center; margin-top:24px; color:#94A3B8; font-size:0.72rem;">
-        Bharat Pashudhan · AI Field Entry Module · Department of Animal Husbandry &amp; Dairying (DAHD)
-    </div>
-    """,
-    unsafe_allow_html=True,
-)

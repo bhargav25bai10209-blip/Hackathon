@@ -462,27 +462,24 @@ def generate_predictions():
 st.markdown(
     """
 <div class="hero">
-    <div class="hero-content">
-        <div class="saffron-tag">
-            PASHUVISIONAI
-        </div>
+<div class="hero-content">
+<div class="saffron-tag">PASHUVISIONAI</div>
 
-        <div class="hero-title">
-            See the animal.<br>
-            <span style="color:#FFB45C;">Know the breed.</span>
-        </div>
+<div class="hero-title">
+See the animal.<br>
+<span style="color:#FFB45C;">Know the breed.</span>
+</div>
 
-        <div class="hero-subtitle">
-            Capture or upload a cattle photograph and let
-            PashuVisionAI identify the animal type, likely breed,
-            confidence and regional information.
-        </div>
-    </div>
+<div class="hero-subtitle">
+Capture or upload a cattle photograph and let
+PashuVisionAI identify the animal type, likely breed,
+confidence and regional information.
+</div>
+</div>
 </div>
 """,
     unsafe_allow_html=True,
 )
-
 # ──────────────────────────────────────────────────────────────────────────
 # STEP 1 — FIELD METADATA
 # ──────────────────────────────────────────────────────────────────────────

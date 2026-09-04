@@ -1,9 +1,5 @@
 """
 Bharat Pashudhan — AI Field Entry Module
-Hackathon prototype: AI-assisted breed identification as a "second opinion"
-for field enumerators entering data into the national livestock database.
-
-Run with: streamlit run app.py
 """
 
 import random
@@ -15,7 +11,7 @@ from PIL import Image
 
 # ----------------------------------------------------------------------------
 # PAGE CONFIG
-# ----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 st.set_page_config(
     page_title="Bharat Pashudhan — AI Field Entry",
     page_icon="🐄",
@@ -23,288 +19,116 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 # DESIGN TOKENS
 # ----------------------------------------------------------------------------
 FOREST_GREEN = "#1E5631"
-NAVY = "#002B49"
-SAFFRON = "#FF9933"
-SAGE_BG = "#F4F7F4"
-CARD_BG = "rgba(255, 255, 255, 0.94)"
-BORDER_COLOR = "#D4E0D5"
-TEXT_MUTED = "#4A5D4E"
+NAVY_PRIMARY = "#0A2540"
+SAFFRON_GOLD = "#FF9933"
+CARD_BG = "#FFFFFF"
+BORDER_COLOR = "#E2E8F0"
+TEXT_MAIN = "#0F172A"
 
 # ----------------------------------------------------------------------------
-# CUSTOM CSS (WITH SUBTLE BACKGROUND WATERMARK & GLASSMORPHISM)
-# ----------------------------------------------------------------------------
+# REFINED CUSTOM CSS (FIXES DARK MODE & FORM INPUTS)
+# --------------------------------------------------------------------
 st.markdown(
-    f"""
+    """
     <style>
-        /* ---- App Shell & Background Image Overlay ---- */
-        .main > div {{
-            max-width: 480px;
-            margin: 0 auto;
-            padding-top: 0.2rem;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        /* Force font family across all elements */
+        html, body, [class*="css"], .stApp {{
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+            background-color: #F8FAFC !important;
         }}
-        html, body, [class*="css"] {{
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+
+        /* Constrain view width to native mobile app column */
+        .main > div {{
+            max-width: 460px;
+            margin: 0 auto;
+            padding: 0.5rem 0.8rem;
+        }}
+
+        /* Fix native input styling to prevent dark mode conflict */
+        div[data-baseweb="select"] > div, 
+        div[data-baseweb="input"] > div, 
+        .stTextInput input {{
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            border-radius: 10px !important;
+            border: 1px solid #CBD5E1 !important;
+        }}
+
+        /* Government Top Header */
+        .gov-header-card {{
+            background: linear-gradient(135deg, #0A2540 0%, #1E3A8A 100%);
+            border-radius: 16px;
+            padding: 16px;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px -5px rgba(10, 37, 64, 0.25);
+            position: relative;
+            overflow: hidden;
         }}
         
-        /* Subtle cattle watermark background (Low opacity ~6%) */
-        .stApp {{
-            background-color: {SAGE_BG};
-            background-image: 
-                linear-gradient(rgba(244, 247, 244, 0.94), rgba(244, 247, 244, 0.94)),
-                url('https://images.unsplash.com/photo-1545468843-279d2bf1694f?auto=format&fit=crop&w=1200&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+        .gov-header-card::after {{
+            content: "";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
         }}
 
-        /* ---- Tricolor Accent Top Bar ---- */
-        .tricolor-bar {{
-            height: 5px;
-            width: 100%;
-            background: linear-gradient(90deg, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%);
-            border-radius: 6px 6px 0 0;
-            margin-bottom: -5px;
-        }}
-
-        /* ---- Enhanced Government Header Banner ---- */
-        .gov-header {{
-            background: linear-gradient(135deg, {NAVY} 0%, #0D47A1 100%);
-            border-radius: 0 0 16px 16px;
-            padding: 18px 20px;
-            color: white;
-            margin-bottom: 18px;
-            box-shadow: 0 6px 18px rgba(0, 43, 73, 0.18);
-        }}
-        .gov-header .emblem-row {{
+        /* Badge Styling */
+        .step-heading {{
             display: flex;
             align-items: center;
-            gap: 14px;
-        }}
-        .gov-header .emblem-badge {{
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 12px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }}
-        .gov-header .emblem-svg {{
-            width: 32px;
-            height: 32px;
-            fill: #FFD700;
-        }}
-        .gov-header h1 {{
-            font-size: 1.15rem;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: 0.3px;
-            color: #FFFFFF;
-        }}
-        .gov-header .subtitle {{
-            font-size: 0.74rem;
-            color: #E0EAE2;
-            margin-top: 2px;
-            font-weight: 500;
-        }}
-        .status-pill {{
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 999px;
-            padding: 3px 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #E8F5E9;
-        }}
-
-        /* ---- Step Label & Badge ---- */
-        .step-label {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.84rem;
+            gap: 10px;
+            font-size: 0.9rem;
             font-weight: 700;
-            color: {NAVY};
-            margin: 18px 0 8px 0;
-            letter-spacing: 0.2px;
+            color: #0A2540;
+            margin: 16px 0 10px 0;
         }}
-        .step-badge {{
-            background: {NAVY};
-            color: white;
-            width: 22px;
-            height: 22px;
+        .step-number {{
+            background: #0A2540;
+            color: #FFFFFF;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 700;
         }}
 
-        /* ---- Glassmorphism Card Styling ---- */
-        .field-card {{
-            background: {CARD_BG};
-            border: 1px solid {BORDER_COLOR};
-            backdrop-filter: blur(8px);
-            border-radius: 14px;
-            padding: 16px 18px;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
-        }}
-
-        /* ---- Metadata Badges ---- */
-        .meta-badge {{
-            background: #F0F5F1;
-            border: 1px solid #D1E0D3;
-            border-radius: 8px;
-            padding: 7px 10px;
-            font-size: 0.76rem;
-            color: {NAVY};
-            margin-bottom: 6px;
-        }}
-        .meta-badge b {{ color: #112817; }}
-
-        /* ---- Predictions Bars ---- */
-        .pred-row {{
-            margin-bottom: 12px;
-        }}
-        .pred-row .pred-top-line {{
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-        }}
-        .pred-rank1 {{
-            font-weight: 700;
-            color: {FOREST_GREEN};
-        }}
-        .pred-rank-other {{
-            font-weight: 600;
-            color: {NAVY};
-        }}
-        .bar-track {{
-            width: 100%;
-            height: 10px;
-            background: #E5EBE5;
-            border-radius: 6px;
-            overflow: hidden;
-        }}
-        .bar-fill-1 {{
-            height: 100%;
-            background: linear-gradient(90deg, {FOREST_GREEN}, #2E7D32);
-            border-radius: 6px;
-        }}
-        .bar-fill-other {{
-            height: 100%;
-            background: {NAVY};
-            opacity: 0.55;
-            border-radius: 6px;
-        }}
-
-        /* ---- Warning & Trait Badges ---- */
-        .warn-badge {{
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #FFF8E1;
-            border: 1px solid {SAFFRON};
-            color: #795548;
-            border-radius: 8px;
-            padding: 8px 10px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }}
-        .trait-tag {{
-            display: inline-block;
-            background: #E8F5E9;
-            color: {FOREST_GREEN};
-            border: 1px solid #C8E6C9;
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.74rem;
-            font-weight: 600;
-            margin: 0 4px 6px 0;
-        }}
-
-        /* ---- Roadmap Feature Grid Cards ---- */
-        .roadmap-grid {{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 8px;
-        }}
-        .roadmap-card {{
+        /* Custom Card Container */
+        .ui-card {{
             background: #FFFFFF;
-            border: 1px dashed #B0C4B1;
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 0.72rem;
-            color: {NAVY};
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }}
-        .roadmap-card b {{
-            font-size: 0.78rem;
-            color: {FOREST_GREEN};
-        }}
-        .roadmap-badge {{
-            align-self: flex-start;
-            background: #ECEFF1;
-            color: #546E7A;
-            border-radius: 4px;
-            padding: 1px 6px;
-            font-size: 0.62rem;
-            font-weight: 700;
-            text-transform: uppercase;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }}
 
-        /* ---- Primary Buttons ---- */
-        div.stButton > button {{
-            width: 100%;
-            border-radius: 10px;
-            padding: 0.6rem 0.5rem;
-            font-weight: 600;
-            font-size: 0.88rem;
-        }}
-        div.stButton > button[kind="primary"] {{
-            background-color: {FOREST_GREEN};
-            border: none;
-            color: white;
-        }}
-
-        /* ---- Impact Footer ---- */
-        .impact-footer {{
-            background: {CARD_BG};
-            border-left: 4px solid {SAFFRON};
+        /* Metadata Pill Display */
+        .meta-pill {{
+            background: #F1F5F9;
+            border: 1px solid #E2E8F0;
             border-radius: 8px;
-            padding: 12px 14px;
-            font-size: 0.76rem;
-            color: {TEXT_MUTED};
-            margin-top: 18px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #334155;
         }}
-        .impact-footer b {{ color: {NAVY}; }}
 
-        /* ---- Confirmation toast ---- */
-        .confirm-card {{
-            background: #E8F5E9;
-            border: 1px solid {FOREST_GREEN};
-            border-radius: 10px;
-            padding: 12px 14px;
-            color: #1B5E20;
-            font-size: 0.84rem;
-            margin-top: 10px;
-        }}
+        /* Hide Streamlit default blank wrapper gaps */
+        .stMarkdown:empty {{ display: none; }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -312,7 +136,7 @@ st.markdown(
 
 # ----------------------------------------------------------------------------
 # MOCK PREDICTION DATA & HIGH-QUALITY REFERENCE IMAGE LINKS
-# ----------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Note: To use local images, replace these URLs with local relative paths (e.g., 'assets/gir.jpg')
 BREED_DATA = {
     "Gir": {
@@ -369,7 +193,7 @@ def predict_breed(image):
 
 # ----------------------------------------------------------------------------
 # HEADER & EMBLEM
-# ----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 st.markdown('<div class="tricolor-bar"></div>', unsafe_allow_html=True)
 st.markdown(
     f"""
@@ -394,17 +218,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
+# --------------------------------------------------------------------------
 # SESSION STATE
-
+# ----------------------------------------------------------------------------
 if "predictions" not in st.session_state:
     st.session_state.predictions = None
 if "saved_log" not in st.session_state:
     st.session_state.saved_log = []
 
-
+# ----------------------------------------------------------------------------
 # STEP 1 — FIELD METADATA
-
+# ---------------------------------------------------------------------------
 st.markdown('<div class="step-label"><span class="step-badge">1</span> Field Metadata</div>', unsafe_allow_html=True)
 
 with st.container():
@@ -421,9 +245,9 @@ with st.container():
     district = st.text_input("District / Tehsil", value="Bhopal")
     st.markdown("</div>", unsafe_allow_html=True)
 
-
+# ---------------------------------------------------------------------------
 # STEP 2 — PHOTO CAPTURE
-
+# ----------------------------------------------------------------------------
 st.markdown('<div class="step-label"><span class="step-badge">2</span> Capture Animal Photo</div>', unsafe_allow_html=True)
 
 with st.container():
@@ -451,8 +275,9 @@ if image is not None:
         with st.spinner("Extracting facial & hump geometry..."):
             st.session_state.predictions = predict_breed(image)
 
+# ----------------------------------------------------------------------------
 # STEP 3 — PREDICTIONS & REFERENCE COMPARISON
-
+# ----------------------------------------------------------------------------
 if st.session_state.predictions:
     preds = st.session_state.predictions
 
@@ -490,7 +315,7 @@ if st.session_state.predictions:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # VISUAL EXPLAINER & REFERENCE BREED COMPARE
+    # --- STEP 4: VISUAL EXPLAINER & REFERENCE BREED COMPARE ---
     st.markdown('<div class="step-label"><span class="step-badge">4</span> Feature Traits & Reference Match</div>', unsafe_allow_html=True)
     
     with st.container():
@@ -510,8 +335,7 @@ if st.session_state.predictions:
             
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # CONFIRMATION & LOGGING
-    
+    # --- STEP 5: CONFIRMATION & LOGGING ---
     st.markdown('<div class="step-label"><span class="step-badge">5</span> Enumerator Confirmation</div>', unsafe_allow_html=True)
     
     with st.container():
@@ -544,8 +368,9 @@ if st.session_state.predictions:
             )
         st.markdown("</div>", unsafe_allow_html=True)
 
+# ----------------------------------------------------------------------------
 # ROADMAP PLACEHOLDERS (FUTURE BACKEND INTEGRATIONS)
-
+# ---------------------------------------------------------------------------
 st.markdown('<div class="step-label">🚀 Upcoming Backend Modules</div>', unsafe_allow_html=True)
 st.markdown(
     """
@@ -575,14 +400,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ----------------------------------------------------------------------------
 # SESSION LOG SUMMARY
-
+# ----------------------------------------------------------------------------
 if st.session_state.saved_log:
     with st.expander(f"📋 Session Logged Entries ({len(st.session_state.saved_log)})"):
         st.table(st.session_state.saved_log)
 
+# ----------------------------------------------------------------------------
 # FOOTER
-
+# ----------------------------------------------------------------------------
 st.markdown(
     """
     <div class="impact-footer">

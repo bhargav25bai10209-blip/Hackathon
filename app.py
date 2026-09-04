@@ -35,8 +35,7 @@ st.set_page_config(
 st.markdown(
     f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap');
     :root {{
         --bg-slate: #F8FAFC;
         --navy: #002B49;
@@ -74,16 +73,23 @@ st.markdown(
 
     .saffron-tag {{
         display: inline-block;
-        background: linear-gradient(135deg, var(--saffron), #FFB366);
-        color: #ffffff;
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        padding: 6px 14px;
+        color: #FFFFFF;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 18px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }}
+    
+    .saffron-tag::after {{
+        content: "";
+        display: block;
+        width: 42px;
+        height: 4px;
+        background: var(--saffron);
         border-radius: 999px;
-        box-shadow: 0 4px 14px rgba(255, 153, 51, 0.35);
-        margin-bottom: 14px;
+        margin: 7px auto 0;
     }}
 
     /* ---------- Hero ---------- */
@@ -121,15 +127,18 @@ st.markdown(
     }}
 
     .hero-title {{
-        font-size: 2.8rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 2.65rem;
         font-weight: 800;
-        line-height: 1.1;
-        margin: 14px 0 12px;
-        letter-spacing: -0.03em;
+        line-height: 1.08;
+        margin: 14px 0 14px;
+        letter-spacing: -0.035em;
+        color: #FFFFFF;
     }}
 
     .hero-subtitle {{
-        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
         line-height: 1.6;
         max-width: 650px;
         margin: 0 auto;
@@ -463,7 +472,7 @@ st.markdown(
     """
 <div class="hero">
 <div class="hero-content">
-<div class="saffron-tag">PASHUVISIONAI</div>
+<div class="saffron-tag">PashuVision-AI</div>
 
 <div class="hero-title">
 See the animal.<br>

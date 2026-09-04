@@ -1,5 +1,5 @@
 """
-Bharat Pashudhan — AI Field Entry Module
+PashuVisionAI | Cattle Identification
 A single-file Streamlit application with a glassmorphism, React/Tailwind-inspired UI.
 Run with: streamlit run app.py
 """
@@ -14,7 +14,7 @@ import streamlit as st
 # PAGE CONFIG
 # ──────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Bharat Pashudhan | AI Field Entry",
+    page_title="PashuVisionAI | Cattle Identification",
     page_icon="🐄",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -109,6 +109,15 @@ st.markdown(
         margin-bottom: 18px;
     }
 
+    .capture-card {
+    background:
+        radial-gradient(circle at 90% 10%, rgba(255, 153, 51, 0.14), transparent 28%),
+        radial-gradient(circle at 10% 90%, rgba(30, 86, 49, 0.10), transparent 30%),
+        linear-gradient(135deg, #FFFFFF, #F4FAF6);
+    border: 1px solid #CFE3D5;
+    box-shadow: 0 12px 35px rgba(30, 86, 49, 0.10);
+}
+
     /* ---------- Metric grid ---------- */
     .metric-card {
         background: rgba(255, 255, 255, 0.9);
@@ -168,6 +177,31 @@ st.markdown(
         border-radius: 10px;
         margin-top: 8px;
     }
+    .empty-state {
+    text-align: center;
+    padding: 26px 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #F8FFFA, #FFF9F2);
+    border: 1px dashed #C9DCCF;
+}
+
+.empty-icon {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.empty-title {
+    color: var(--navy);
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.empty-desc {
+    color: #64748B;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
     .badge-ok {
         display: inline-block;
         background: #ECFDF3;
@@ -306,45 +340,20 @@ def generate_predictions():
 # ──────────────────────────────────────────────────────────────────────────
 # HEADER
 # ──────────────────────────────────────────────────────────────────────────
-st.markdown('<span class="saffron-tag">AI Field Entry Module</span>', unsafe_allow_html=True)
+st.markdown('<span class="saffron-tag">PASHUVISIONAI</span>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="main-heading">Breed identification as a <span class="gradient-text">second opinion</span></div>',
+    '<div class="main-heading">See the animal. <span class="gradient-text">Know the breed.</span></div>',
     unsafe_allow_html=True,
 )
 st.markdown(
     """
     <div class="header-desc">
-    Enumerators capture a photo in the field; the on-device model returns a short‑list of the
-    most likely breeds, each cross‑checked against standard breed plates. Every prediction is
-    stamped with an AI audit trail before the enumerator confirms the final entry — the system
-    assists judgement, it never replaces it.
-    </div>
+Capture or upload a cattle photograph and let PashuVisionAI identify the animal type,
+likely breed, confidence and regions where the breed is commonly found.
+</div>
     """,
     unsafe_allow_html=True,
 )
-
-# ──────────────────────────────────────────────────────────────────────────
-# LIVE STATS BANNER
-# ──────────────────────────────────────────────────────────────────────────
-m1, m2, m3, m4 = st.columns(4)    #NEEDS TO BE CHANGED AFTER BACKEND!!!!!!!!
-metrics = [
-    (m1, "📋", "Records in module", "124"),
-    (m2, "🎯", "AI / Enumerator match", "87%"),
-    (m3, "⚠️", "Borderline cases", "12"),
-    (m4, "🗺️", "Districts covered", "18"),
-]
-for col, icon, label, value in metrics:
-    with col:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-icon">{icon}</div>
-                <div class="micro-label">{label}</div>
-                <div class="metric-value">{value}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
 st.markdown('<hr class="soft-divider">', unsafe_allow_html=True)
 
@@ -355,7 +364,7 @@ st.markdown(
     """
     <div class="section-step">
         <div class="step-badge">1</div>
-        <div class="step-title">Field Metadata</div>
+        <div class="step-title">Observation Location</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -363,17 +372,11 @@ st.markdown(
 
 with st.container():
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2 = st.columns(2)    
     with c1:
-        st.markdown('<div class="micro-label">Tag ID (auto)</div>', unsafe_allow_html=True)
-        st.text_input("Tag ID", value=st.session_state.tag_id, disabled=True, label_visibility="collapsed")
-    with c2:
-        st.markdown('<div class="micro-label">Worker ID</div>', unsafe_allow_html=True)
-        st.text_input("Worker ID", value=st.session_state.worker_id, disabled=True, label_visibility="collapsed")
-    with c3:
         st.markdown('<div class="micro-label">State</div>', unsafe_allow_html=True)
         state = st.selectbox("State", INDIAN_STATES, label_visibility="collapsed")
-    with c4:
+    with c2:
         st.markdown('<div class="micro-label">District</div>', unsafe_allow_html=True)
         district = st.text_input("District", placeholder="e.g. Bharuch", label_visibility="collapsed")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -392,7 +395,7 @@ st.markdown(
 )
 
 with st.container():
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown('<div class="glass-card capture-card">', unsafe_allow_html=True)
     tab_upload, tab_camera = st.tabs(["📁 Upload File", "📷 Live Camera Capture"])
     captured_image = None
     with tab_upload:
@@ -425,7 +428,7 @@ st.markdown(
     """
     <div class="section-step">
         <div class="step-badge">3</div>
-        <div class="step-title">Predictions &amp; Confidence</div>
+        <div class="step-title">AI Identification</div>
     </div>
     """,
     unsafe_allow_html=True,

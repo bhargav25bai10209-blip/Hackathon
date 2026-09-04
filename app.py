@@ -6,10 +6,19 @@ Run with: streamlit run app.py
 
 import random
 import string
+import base64
 from datetime import datetime
 
 import streamlit as st
 
+# ──────────────────────────────────────────────────────────────────────────
+# header img
+# ──────────────────────────────────────────────────────────────────────
+
+def get_image_base64(path):
+    with open(path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode()
+hero_image = get_image_base64("assets/cattle-hero.jpg")
 # ──────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
 # ──────────────────────────────────────────────────────────────────────────
@@ -24,44 +33,46 @@ st.set_page_config(
 # GLOBAL STYLES (Glassmorphism / Tailwind-inspired design system)
 # ──────────────────────────────────────────────────────────────────────────
 st.markdown(
-    """
+    f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    :root {
+    :root {{
         --bg-slate: #F8FAFC;
         --navy: #002B49;
         --forest: #1E5631;
         --saffron: #FF9933;
         --border-soft: #E2E8F0;
-    }
+    }}
 
-    html, body, [class*="css"] {
+    html, body, [class*="css"] {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    }}
 
-    .stApp {
+    .stApp {{
         background: var(--bg-slate);
-    }
+    }}
 
-    #MainMenu, footer, header {visibility: hidden;}
+    #MainMenu, footer, header {{
+        visibility: hidden;
+    }}
 
-    .block-container {
+    .block-container {{
         padding-top: 1.5rem;
         padding-bottom: 3rem;
         max-width: 1200px;
-    }
+    }}
 
     /* ---------- Micro label ---------- */
-    .micro-label {
+    .micro-label {{
         font-size: 0.65rem;
         font-weight: 700;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #64748B;
-    }
+    }}
 
-    .saffron-tag {
+    .saffron-tag {{
         display: inline-block;
         background: linear-gradient(135deg, var(--saffron), #FFB366);
         color: #ffffff;
@@ -73,32 +84,84 @@ st.markdown(
         border-radius: 999px;
         box-shadow: 0 4px 14px rgba(255, 153, 51, 0.35);
         margin-bottom: 14px;
-    }
+    }}
 
-    /* ---------- Header ---------- */
-    .main-heading {
+    /* ---------- Hero ---------- */
+    .hero {{
+        position: relative;
+        min-height: 360px;
+        border-radius: 22px;
+        overflow: hidden;
+        margin-bottom: 28px;
+
+        background-image:
+            linear-gradient(
+                90deg,
+                rgba(0, 43, 73, 0.62),
+                rgba(0, 43, 73, 0.38),
+                rgba(0, 0, 0, 0.15)
+            ),
+            url("data:image/jpeg;base64,{hero_image}");
+
+        background-size: cover;
+        background-position: center;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }}
+
+    .hero-content {{
+        position: relative;
+        z-index: 2;
+        max-width: 760px;
+        padding: 50px 30px;
+        color: white;
+    }}
+
+    .hero-title {{
+        font-size: 2.8rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin: 14px 0 12px;
+        letter-spacing: -0.03em;
+    }}
+
+    .hero-subtitle {{
+        font-size: 1rem;
+        line-height: 1.6;
+        max-width: 650px;
+        margin: 0 auto;
+        color: rgba(255,255,255,0.88);
+    }}
+
+    /* ---------- Old header styles ---------- */
+    .main-heading {{
         font-size: 2.4rem;
         font-weight: 800;
         color: var(--navy);
         line-height: 1.15;
         margin: 4px 0 10px 0;
-    }
-    .gradient-text {
+    }}
+
+    .gradient-text {{
         background: linear-gradient(90deg, var(--forest), var(--saffron));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-    }
-    .header-desc {
+    }}
+
+    .header-desc {{
         color: #475569;
         font-size: 0.95rem;
         max-width: 780px;
         line-height: 1.55;
         margin-bottom: 24px;
-    }
+    }}
 
     /* ---------- Glass card ---------- */
-    .glass-card {
+    .glass-card {{
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid var(--border-soft);
         border-radius: 16px;
@@ -107,19 +170,29 @@ st.markdown(
         box-shadow: 0 8px 30px rgba(2, 32, 71, 0.06);
         padding: 20px 22px;
         margin-bottom: 18px;
-    }
+    }}
 
-    .capture-card {
-    background:
-        radial-gradient(circle at 90% 10%, rgba(255, 153, 51, 0.14), transparent 28%),
-        radial-gradient(circle at 10% 90%, rgba(30, 86, 49, 0.10), transparent 30%),
-        linear-gradient(135deg, #FFFFFF, #F4FAF6);
-    border: 1px solid #CFE3D5;
-    box-shadow: 0 12px 35px rgba(30, 86, 49, 0.10);
-}
+    /* ---------- Colorful capture card ---------- */
+    .capture-card {{
+        background:
+            radial-gradient(
+                circle at 90% 10%,
+                rgba(255, 153, 51, 0.14),
+                transparent 28%
+            ),
+            radial-gradient(
+                circle at 10% 90%,
+                rgba(30, 86, 49, 0.10),
+                transparent 30%
+            ),
+            linear-gradient(135deg, #FFFFFF, #F4FAF6);
+
+        border: 1px solid #CFE3D5;
+        box-shadow: 0 12px 35px rgba(30, 86, 49, 0.10);
+    }}
 
     /* ---------- Metric grid ---------- */
-    .metric-card {
+    .metric-card {{
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid var(--border-soft);
         border-radius: 16px;
@@ -128,25 +201,28 @@ st.markdown(
         padding: 18px 20px;
         text-align: left;
         transition: transform 0.15s ease;
-    }
-    .metric-value {
+    }}
+
+    .metric-value {{
         font-size: 1.9rem;
         font-weight: 800;
         color: var(--navy);
         margin-top: 4px;
-    }
-    .metric-icon {
+    }}
+
+    .metric-icon {{
         font-size: 1.2rem;
-    }
+    }}
 
     /* ---------- Section header ---------- */
-    .section-step {
+    .section-step {{
         display: flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 4px;
-    }
-    .step-badge {
+    }}
+
+    .step-badge {{
         background: var(--navy);
         color: white;
         font-weight: 800;
@@ -158,15 +234,16 @@ st.markdown(
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-    }
-    .step-title {
+    }}
+
+    .step-title {{
         font-size: 1.05rem;
         font-weight: 700;
         color: var(--navy);
-    }
+    }}
 
     /* ---------- Badges ---------- */
-    .badge-warning {
+    .badge-warning {{
         display: inline-block;
         background: #FFF7E6;
         color: #92600A;
@@ -176,33 +253,9 @@ st.markdown(
         padding: 6px 12px;
         border-radius: 10px;
         margin-top: 8px;
-    }
-    .empty-state {
-    text-align: center;
-    padding: 26px 20px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #F8FFFA, #FFF9F2);
-    border: 1px dashed #C9DCCF;
-}
+    }}
 
-.empty-icon {
-    font-size: 1.8rem;
-    margin-bottom: 8px;
-}
-
-.empty-title {
-    color: var(--navy);
-    font-size: 1rem;
-    font-weight: 800;
-    margin-bottom: 5px;
-}
-
-.empty-desc {
-    color: #64748B;
-    font-size: 0.78rem;
-    line-height: 1.5;
-}
-    .badge-ok {
+    .badge-ok {{
         display: inline-block;
         background: #ECFDF3;
         color: var(--forest);
@@ -212,10 +265,37 @@ st.markdown(
         padding: 6px 12px;
         border-radius: 10px;
         margin-top: 8px;
-    }
+    }}
+
+    /* ---------- Empty state ---------- */
+    .empty-state {{
+        text-align: center;
+        padding: 26px 20px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #F8FFFA, #FFF9F2);
+        border: 1px dashed #C9DCCF;
+    }}
+
+    .empty-icon {{
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }}
+
+    .empty-title {{
+        color: var(--navy);
+        font-size: 1rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }}
+
+    .empty-desc {{
+        color: #64748B;
+        font-size: 0.78rem;
+        line-height: 1.5;
+    }}
 
     /* ---------- Feature tag ---------- */
-    .feature-tag {
+    .feature-tag {{
         display: inline-block;
         background: #F0FDF4;
         color: var(--forest);
@@ -225,72 +305,110 @@ st.markdown(
         padding: 6px 12px;
         border-radius: 10px;
         margin: 3px 4px 3px 0;
-    }
+    }}
+
+    /* ---------- Breed profile ---------- */
+    .breed-profile {{
+        background: linear-gradient(145deg, #FFF7EA, #F0FDF4);
+        border: 1px solid #D8E5D9;
+        border-radius: 14px;
+        padding: 22px 14px;
+        text-align: center;
+    }}
+
+    .breed-animal {{
+        font-size: 2.5rem;
+        margin-bottom: 6px;
+    }}
+
+    .breed-result-label {{
+        color: #64748B;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+    }}
+
+    .breed-result-name {{
+        color: var(--forest);
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin: 3px 0 5px;
+    }}
 
     /* ---------- Breed prediction bar ---------- */
-    .breed-row {
+    .breed-row {{
         margin-bottom: 14px;
-    }
-    .breed-name-row {
+    }}
+
+    .breed-name-row {{
         display: flex;
         justify-content: space-between;
         font-size: 0.85rem;
         font-weight: 700;
         color: var(--navy);
         margin-bottom: 5px;
-    }
-    .progress-track {
+    }}
+
+    .progress-track {{
         width: 100%;
         height: 10px;
         background: #EDF2F7;
         border-radius: 999px;
         overflow: hidden;
-    }
-    .progress-fill {
+    }}
+
+    .progress-fill {{
         height: 100%;
         border-radius: 999px;
-    }
+    }}
 
-    /* ---------- Footer roadmap ---------- */
-    .roadmap-card {
+    /* ---------- Roadmap ---------- */
+    .roadmap-card {{
         background: rgba(255, 255, 255, 0.9);
         border: 1px dashed var(--border-soft);
         border-radius: 16px;
         padding: 16px 18px;
         text-align: center;
         height: 100%;
-    }
-    .roadmap-icon {
+    }}
+
+    .roadmap-icon {{
         font-size: 1.6rem;
         margin-bottom: 6px;
-    }
-    .roadmap-title {
+    }}
+
+    .roadmap-title {{
         font-weight: 700;
         color: var(--navy);
         font-size: 0.88rem;
         margin-bottom: 4px;
-    }
-    .roadmap-desc {
+    }}
+
+    .roadmap-desc {{
         font-size: 0.75rem;
         color: #64748B;
-    }
+    }}
 
-    hr.soft-divider {
+    /* ---------- Divider ---------- */
+    hr.soft-divider {{
         border: none;
         border-top: 1px solid var(--border-soft);
         margin: 28px 0 20px 0;
-    }
+    }}
 
-    .stButton>button {
+    /* ---------- Buttons ---------- */
+    .stButton>button {{
         border-radius: 12px;
         font-weight: 700;
         border: none;
         padding: 0.55rem 1.2rem;
-    }
-    div[data-testid="stFormSubmitButton"] button {
+    }}
+
+    div[data-testid="stFormSubmitButton"] button {{
         border-radius: 12px;
         font-weight: 700;
-    }
+    }}
+
     </style>
     """,
     unsafe_allow_html=True,
@@ -342,15 +460,27 @@ def generate_predictions():
 # ──────────────────────────────────────────────────────────────────────────
 st.markdown('<span class="saffron-tag">PASHUVISIONAI</span>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="main-heading">See the animal. <span class="gradient-text">Know the breed.</span></div>',
-    unsafe_allow_html=True,
-)
-st.markdown(
     """
-    <div class="header-desc">
-Capture or upload a cattle photograph and let PashuVisionAI identify the animal type,
-likely breed, confidence and regions where the breed is commonly found.
-</div>
+    <div class="hero">
+        <div class="hero-content">
+
+            <div class="saffron-tag">
+                PASHUVISIONAI
+            </div>
+
+            <div class="hero-title">
+                See the animal.<br>
+                <span style="color:#FFB45C;">Know the breed.</span>
+            </div>
+
+            <div class="hero-subtitle">
+                Capture or upload a cattle photograph and let
+                PashuVisionAI identify the animal type, likely breed,
+                confidence and regional information.
+            </div>
+
+        </div>
+    </div>
     """,
     unsafe_allow_html=True,
 )

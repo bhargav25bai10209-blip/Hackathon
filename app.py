@@ -498,37 +498,26 @@ st.markdown(
         transform: none !important;
     }}
 
-    /* ── Dual Capture buttons ─────────────────────────────────────────────── */
+/* Dual Capture cards */
+div[data-testid="stButton"] > button {{
+    min-height: 150px;
+    border-radius: 18px;
+    font-size: 1rem;
+    font-weight: 800;
+    white-space: pre-line;
+    line-height: 1.7;
+    padding: 20px;
+}}
 
-    button[kind="secondary"] {{
-        min-height: 150px;
-        border-radius: 18px;
-        font-size: 1rem;
-        font-weight: 800;
-        white-space: pre-line;
-        line-height: 1.7;
-        padding: 20px;
-        transition: all 0.18s ease;
-    }}
-    
-    button[kind="secondary"]:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 14px 30px rgba(0, 43, 73, 0.18);
-    }}
-    
-    /* Camera card */
-    div[data-testid="column"]:first-child button[kind="secondary"] {{
-        background: #002B49;
-        color: #FFFFFF;
-        border: 1px solid #002B49;
-    }}
-    
-    /* Upload card */
-    div[data-testid="column"]:nth-child(2) button[kind="secondary"] {{
-        background: #1E5631;
-        color: #FFFFFF;
-        border: 1px solid #1E5631;
-    }}
+div[data-testid="stButton"] > button:hover {{
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(0, 43, 73, 0.18);
+}}
+
+/* Camera button */
+div[data-testid="stButton"]:has(button[kind="secondary"]) > button {{
+    min-height: 150px;
+}}
 
     div[data-testid="stFormSubmitButton"] button {{
         border-radius: 12px;

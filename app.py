@@ -437,6 +437,40 @@ st.markdown(
         border-radius: 12px;
         font-weight: 700;
     }}
+
+    ------/* Dropdowns / Select boxes */---------
+    div[data-baseweb="select"] > div {{
+        background-color: #FFFFFF !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 10px !important;
+        color: #002B49 !important;
+    }}
+    
+    div[data-baseweb="select"] span {{
+        color: #002B49 !important;
+    }}
+    
+    div[data-baseweb="select"] svg {{
+        fill: #002B49 !important;
+    }}
+
+    -----------/* Dropdown menu */--------
+    div[data-baseweb="popover"] {{
+        background-color: #FFFFFF !important;
+    }}
+    
+    ul[role="listbox"] {{
+        background-color: #FFFFFF !important;
+    }}
+    
+    li[role="option"] {{
+        background-color: #FFFFFF !important;
+        color: #002B49 !important;
+    }}
+    
+    li[role="option"]:hover {{
+        background-color: #EEF2F6 !important;
+    }}
     
         </style>
         """,

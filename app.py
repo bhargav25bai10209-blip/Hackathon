@@ -773,7 +773,7 @@ Use your camera in the field or upload an existing photograph.
                 caption="Uploaded field photo",
                 width=280
             )
-            )
+         
 
     st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)

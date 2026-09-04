@@ -736,43 +736,43 @@ Use your camera in the field or upload an existing photograph.
                 captured_image = cam_photo
 
     with capture_col2:
-    st.markdown(
-        """
-<div class="capture-option capture-upload">
-<div class="capture-icon">🖼️</div>
-<div class="capture-title">Upload Photo</div>
-<div class="capture-desc">Choose an existing cattle photograph</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-    if not st.session_state.show_upload:
-
-        if st.button("🖼️ Choose Photo", key="open_upload", use_container_width=True):
-            st.session_state.show_upload = True
-            st.session_state.show_camera = False
-            st.rerun()
-
-    else:
-
-        if st.button("✕ Close Upload", key="close_upload", use_container_width=True):
-            st.session_state.show_upload = False
-            st.rerun()
-
-        uploaded = st.file_uploader(
-            "Upload an animal photo",
-            type=["jpg", "jpeg", "png"],
-            label_visibility="collapsed"
+        st.markdown(
+            """
+    <div class="capture-option capture-upload">
+    <div class="capture-icon">🖼️</div>
+    <div class="capture-title">Upload Photo</div>
+    <div class="capture-desc">Choose an existing cattle photograph</div>
+    </div>
+    """,
+            unsafe_allow_html=True,
         )
-
-        if uploaded is not None:
-            captured_image = uploaded
-            st.image(
-                uploaded,
-                caption="Uploaded field photo",
-                width=280
+    
+        if not st.session_state.show_upload:
+    
+            if st.button("🖼️ Choose Photo", key="open_upload", use_container_width=True):
+                st.session_state.show_upload = True
+                st.session_state.show_camera = False
+                st.rerun()
+    
+        else:
+    
+            if st.button("✕ Close Upload", key="close_upload", use_container_width=True):
+                st.session_state.show_upload = False
+                st.rerun()
+    
+            uploaded = st.file_uploader(
+                "Upload an animal photo",
+                type=["jpg", "jpeg", "png"],
+                label_visibility="collapsed"
             )
+    
+            if uploaded is not None:
+                captured_image = uploaded
+                st.image(
+                    uploaded,
+                    caption="Uploaded field photo",
+                    width=280
+                )
          
 
     st.markdown("</div>", unsafe_allow_html=True)

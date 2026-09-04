@@ -726,29 +726,6 @@ if st.session_state.entries:
 # ──────────────────────────────────────────────────────────────────────────
 # FOOTER — UPCOMING BACKEND MODULES ROADMAP
 # ──────────────────────────────────────────────────────────────────────────
-st.markdown('<hr class="soft-divider">', unsafe_allow_html=True)
-st.markdown('<div class="micro-label" style="margin-bottom:12px;">Upcoming backend modules</div>', unsafe_allow_html=True)
-
-roadmap_items = [
-    ("🏷️", "Ear Tag OCR", "Automated tag-number extraction from field photos."),
-    ("💉", "Vaccine Verification", "Cross-check vaccination records against the national registry."),
-    ("🛰️", "Geospatial Analytics", "District and block-level heat-maps of breed distribution."),
-    ("🔄", "Offline Sync Queue", "Queue entries captured without connectivity for later sync."),
-]
-
-r1, r2, r3, r4 = st.columns(4)
-for col, (icon, title, desc) in zip([r1, r2, r3, r4], roadmap_items):
-    with col:
-        st.markdown(
-            f"""
-            <div class="roadmap-card">
-                <div class="roadmap-icon">{icon}</div>
-                <div class="roadmap-title">{title}</div>
-                <div class="roadmap-desc">{desc}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
 st.markdown(
     """

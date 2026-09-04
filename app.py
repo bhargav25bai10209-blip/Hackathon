@@ -37,7 +37,7 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap');
     :root {{
-        --bg-slate: #F8FAFC;
+        --bg-slate: #EEF2F6;
         --navy: #002B49;
         --forest: #1E5631;
         --saffron: #FF9933;
@@ -59,7 +59,7 @@ st.markdown(
     .block-container {{
         padding-top: 1.5rem;
         padding-bottom: 3rem;
-        max-width: 1400px;
+        max-width: 1200px;
     }}
 
     /* ---------- Micro label ---------- */
@@ -171,8 +171,8 @@ st.markdown(
 
     /* ---------- Glass card ---------- */
     .glass-card {{
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid var(--border-soft);
+        background: #FFFFFF;
+        border: 1px solid #CBD5E1;
         border-radius: 16px;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
@@ -181,55 +181,7 @@ st.markdown(
         margin-bottom: 18px;
     }}
 
-    /* ---------- Colorful capture card ---------- */
-
     /* ---------- Dual Capture Actions ---------- */
-
-    .capture-option {{
-        border-radius: 18px;
-        padding: 24px 22px;
-        min-height: 150px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        color: white;
-        box-shadow: 0 10px 25px rgba(0, 43, 73, 0.14);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-        margin-bottom: 14px;
-    }}
-    
-    .capture-option:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 16px 32px rgba(0, 43, 73, 0.18);
-    }}
-    
-    .capture-camera {{
-        background: linear-gradient(145deg, #002B49, #06496F);
-    }}
-    
-    .capture-upload {{
-        background: linear-gradient(145deg, #1E5631, #2D7545);
-    }}
-    
-    .capture-icon {{
-        font-size: 2.5rem;
-        line-height: 1;
-        margin-bottom: 12px;
-    }}
-    
-    .capture-title {{
-        font-size: 1.05rem;
-        font-weight: 800;
-        margin-bottom: 5px;
-    }}
-    
-    .capture-desc {{
-        font-size: 0.76rem;
-        opacity: 0.82;
-        line-height: 1.4;
-    }}
     
     .capture-label {{
         font-size: 0.68rem;
@@ -469,11 +421,22 @@ st.markdown(
         border: none;
         padding: 0.55rem 1.2rem;
     }}
-
-        div[data-testid="stFormSubmitButton"] button {{
-            border-radius: 12px;
-            font-weight: 700;
-        }}
+    
+    .stButton>button[kind="primary"] {{
+        background: #FF9933;
+        color: #FFFFFF;
+        border: none;
+    }}
+    
+    .stButton>button[kind="primary"]:hover {{
+        background: #E9821C;
+        color: #FFFFFF;
+    }}
+    
+    div[data-testid="stFormSubmitButton"] button {{
+        border-radius: 12px;
+        font-weight: 700;
+    }}
     
         </style>
         """,

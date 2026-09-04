@@ -30,7 +30,7 @@ st.set_page_config(
 )
 
 # ──────────────────────────────────────────────────────────────────────────
-# GLOBAL STYLES (Glassmorphism / Tailwind-inspired design system)
+# CSS
 # ──────────────────────────────────────────────────────────────────────────
 st.markdown(
     f"""
@@ -59,7 +59,7 @@ st.markdown(
     .block-container {{
         padding-top: 1.5rem;
         padding-bottom: 3rem;
-        max-width: 1200px;
+        max-width: 1400px;
     }}
 
     /* ---------- Micro label ---------- */
@@ -470,64 +470,15 @@ st.markdown(
         padding: 0.55rem 1.2rem;
     }}
 
-    .capture-button-wrapper {{
-        position: relative;
-        margin-bottom: 14px;
-    }}
+        div[data-testid="stFormSubmitButton"] button {{
+            border-radius: 12px;
+            font-weight: 700;
+        }}
     
-    .capture-button-wrapper .stButton {{
-        position: absolute;
-        inset: 0;
-        z-index: 10;
-    }}
-    
-    .capture-button-wrapper .stButton > button {{
-        width: 100%;
-        height: 100%;
-        min-height: 150px;
-        opacity: 0;
-        cursor: pointer;
-        border: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }}
-    
-    .capture-button-wrapper .stButton > button:hover {{
-        border: none !important;
-        box-shadow: none !important;
-        transform: none !important;
-    }}
-
-/* Dual Capture cards */
-div[data-testid="stButton"] > button {{
-    min-height: 150px;
-    border-radius: 18px;
-    font-size: 1rem;
-    font-weight: 800;
-    white-space: pre-line;
-    line-height: 1.7;
-    padding: 20px;
-}}
-
-div[data-testid="stButton"] > button:hover {{
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px rgba(0, 43, 73, 0.18);
-}}
-
-/* Camera button */
-div[data-testid="stButton"]:has(button[kind="secondary"]) > button {{
-    min-height: 150px;
-}}
-
-    div[data-testid="stFormSubmitButton"] button {{
-        border-radius: 12px;
-        font-weight: 700;
-    }}
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ──────────────────────────────────────────────────────────────────────────
 # SESSION STATE INIT

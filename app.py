@@ -662,7 +662,11 @@ with st.container():
             district_options,
             label_visibility="collapsed"
         )
+if "show_camera" not in st.session_state:
+    st.session_state.show_camera = False
 
+if "show_upload" not in st.session_state:
+    st.session_state.show_upload = False
 # ──────────────────────────────────────────────────────────────────────────
 # STEP 2 — DUAL CAPTURE
 # ──────────────────────────────────────────────────────────────────────────
@@ -699,19 +703,32 @@ Use your camera in the field or upload an existing photograph.
     captured_image = None
 
     with capture_col1:
-        st.markdown(
-            """
+    st.markdown(
+        """
 <div class="capture-option capture-camera">
 <div class="capture-icon">📷</div>
-<div class="capture-title">Live Camera</div>
-<div class="capture-desc">Take a photograph of the animal now</div>
+<div class="capture-title">Take a Photo</div>
+<div class="capture-desc">Capture the animal using your camera</div>
 </div>
 """,
-            unsafe_allow_html=True,
-        )
+        unsafe_allow_html=True,
+    )
+
+    if not st.session_state.show_camera:
+
+        if st.button("📷 Open Camera", key="open_camera", use_container_width=True):
+            st.session_state.show_camera = True
+            st.session_state.show_upload = False
+            st.rerun()
+
+    else:
+
+        if st.button("✕ Close Camera", key="close_camera", use_container_width=True):
+            st.session_state.show_camera = False
+            st.rerun()
 
         cam_photo = st.camera_input(
-            "Capture live photo",
+            "Take a photo",
             label_visibility="collapsed"
         )
 
@@ -719,16 +736,29 @@ Use your camera in the field or upload an existing photograph.
             captured_image = cam_photo
 
     with capture_col2:
-        st.markdown(
-            """
+    st.markdown(
+        """
 <div class="capture-option capture-upload">
 <div class="capture-icon">🖼️</div>
 <div class="capture-title">Upload Photo</div>
 <div class="capture-desc">Choose an existing cattle photograph</div>
 </div>
 """,
-            unsafe_allow_html=True,
-        )
+        unsafe_allow_html=True,
+    )
+
+    if not st.session_state.show_upload:
+
+        if st.button("🖼️ Choose Photo", key="open_upload", use_container_width=True):
+            st.session_state.show_upload = True
+            st.session_state.show_camera = False
+            st.rerun()
+
+    else:
+
+        if st.button("✕ Close Upload", key="close_upload", use_container_width=True):
+            st.session_state.show_upload = False
+            st.rerun()
 
         uploaded = st.file_uploader(
             "Upload an animal photo",
@@ -742,6 +772,7 @@ Use your camera in the field or upload an existing photograph.
                 uploaded,
                 caption="Uploaded field photo",
                 width=280
+            )
             )
 
     st.markdown("</div>", unsafe_allow_html=True)

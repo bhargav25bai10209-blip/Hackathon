@@ -703,37 +703,37 @@ Use your camera in the field or upload an existing photograph.
     captured_image = None
 
     with capture_col1:
-    st.markdown(
-        """
-<div class="capture-option capture-camera">
-<div class="capture-icon">📷</div>
-<div class="capture-title">Take a Photo</div>
-<div class="capture-desc">Capture the animal using your camera</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-    if not st.session_state.show_camera:
-
-        if st.button("📷 Open Camera", key="open_camera", use_container_width=True):
-            st.session_state.show_camera = True
-            st.session_state.show_upload = False
-            st.rerun()
-
-    else:
-
-        if st.button("✕ Close Camera", key="close_camera", use_container_width=True):
-            st.session_state.show_camera = False
-            st.rerun()
-
-        cam_photo = st.camera_input(
-            "Take a photo",
-            label_visibility="collapsed"
+        st.markdown(
+            """
+    <div class="capture-option capture-camera">
+    <div class="capture-icon">📷</div>
+    <div class="capture-title">Take a Photo</div>
+    <div class="capture-desc">Capture the animal using your camera</div>
+    </div>
+    """,
+            unsafe_allow_html=True,
         )
-
-        if cam_photo is not None:
-            captured_image = cam_photo
+    
+        if not st.session_state.show_camera:
+    
+            if st.button("📷 Open Camera", key="open_camera", use_container_width=True):
+                st.session_state.show_camera = True
+                st.session_state.show_upload = False
+                st.rerun()
+    
+        else:
+    
+            if st.button("✕ Close Camera", key="close_camera", use_container_width=True):
+                st.session_state.show_camera = False
+                st.rerun()
+    
+            cam_photo = st.camera_input(
+                "Take a photo",
+                label_visibility="collapsed"
+            )
+    
+            if cam_photo is not None:
+                captured_image = cam_photo
 
     with capture_col2:
     st.markdown(

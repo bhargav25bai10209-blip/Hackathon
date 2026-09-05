@@ -438,13 +438,27 @@ st.markdown(
         font-weight: 700;
     }}
 
-  ------/* Dropdowns / Select boxes */-----
+    /* ---------- Dropdowns / Select boxes ---------- */
+    
+    div[data-baseweb="select"] {{
+        background-color: #002B49 !important;
+        border-radius: 10px !important;
+    }}
+    
     div[data-baseweb="select"] > div {{
         background-color: #002B49 !important;
         border: 1px solid #002B49 !important;
         border-radius: 10px !important;
+        box-shadow: none !important;
+    }}
+    
+    div[data-baseweb="select"] [role="combobox"] {{
+        background-color: #002B49 !important;
         color: #FFFFFF !important;
-        min-height: 42px !important;
+    }}
+    
+    div[data-baseweb="select"] div {{
+        color: #FFFFFF !important;
     }}
     
     div[data-baseweb="select"] span {{
@@ -453,24 +467,25 @@ st.markdown(
     
     div[data-baseweb="select"] svg {{
         fill: #FFFFFF !important;
+        color: #FFFFFF !important;
     }}
     
-    /* Dropdown menu when opened */
+    /* ---------- Open dropdown menu ---------- */
+    
     div[data-baseweb="popover"] {{
         background-color: #FFFFFF !important;
-        border: 1px solid #CBD5E1 !important;
     }}
     
-    ul[role="listbox"] {{
+    div[data-baseweb="popover"] ul {{
         background-color: #FFFFFF !important;
     }}
     
-    li[role="option"] {{
+    div[data-baseweb="popover"] li {{
         background-color: #FFFFFF !important;
         color: #002B49 !important;
     }}
     
-    li[role="option"]:hover {{
+    div[data-baseweb="popover"] li:hover {{
         background-color: #EEF2F6 !important;
         color: #002B49 !important;
     }}

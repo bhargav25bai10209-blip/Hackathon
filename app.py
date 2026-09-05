@@ -438,38 +438,93 @@ st.markdown(
         font-weight: 700;
     }}
 
-    ------/* Dropdowns / Select boxes */---------
-    div[data-baseweb="select"] > div {{
-        background-color: #FFFFFF !important;
-        border: 1px solid #CBD5E1 !important;
+    /* ---------- Dropdowns / Select boxes ---------- */
+    
+    div[data-baseweb="select"] {{
+        background-color: #002B49 !important;
         border-radius: 10px !important;
-        color: #002B49 !important;
+    }}
+    
+    div[data-baseweb="select"] > div {{
+        background-color: #002B49 !important;
+        border: 1px solid #002B49 !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+    }}
+    
+    div[data-baseweb="select"] [role="combobox"] {{
+        background-color: #002B49 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    div[data-baseweb="select"] div {{
+        color: #FFFFFF !important;
     }}
     
     div[data-baseweb="select"] span {{
-        color: #002B49 !important;
+        color: #FFFFFF !important;
     }}
     
     div[data-baseweb="select"] svg {{
-        fill: #002B49 !important;
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
     }}
-
-    -----------/* Dropdown menu */--------
+    
+    /* ---------- Open dropdown menu ---------- */
+    
     div[data-baseweb="popover"] {{
         background-color: #FFFFFF !important;
     }}
     
-    ul[role="listbox"] {{
+    div[data-baseweb="popover"] ul {{
         background-color: #FFFFFF !important;
     }}
     
-    li[role="option"] {{
+    div[data-baseweb="popover"] li {{
         background-color: #FFFFFF !important;
         color: #002B49 !important;
     }}
     
-    li[role="option"]:hover {{
+    div[data-baseweb="popover"] li:hover {{
         background-color: #EEF2F6 !important;
+        color: #002B49 !important;
+    }}
+
+    /* ---------- Dropdowns / Select boxes ---------- */
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child {{
+        background-color: #002B49 !important;
+        border: 1px solid #002B49 !important;
+        border-radius: 10px !important;
+        min-height: 42px !important;
+    }}
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child > div {{
+        color: #FFFFFF !important;
+    }}
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child span {{
+        color: #FFFFFF !important;
+    }}
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child svg {{
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
+    }}
+    
+    /* Open dropdown */
+    [data-testid="stVirtualDropdown"] {{
+        background-color: #FFFFFF !important;
+    }}
+    
+    [data-testid="stVirtualDropdown"] li {{
+        background-color: #FFFFFF !important;
+        color: #002B49 !important;
+    }}
+    
+    [data-testid="stVirtualDropdown"] li:hover {{
+        background-color: #EEF2F6 !important;
+        color: #002B49 !important;
     }}
     
         </style>

@@ -490,22 +490,41 @@ st.markdown(
         color: #002B49 !important;
     }}
 
-    -----------/* Dropdown menu */--------
-    div[data-baseweb="popover"] {{
+    /* ---------- Dropdowns / Select boxes ---------- */
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child {{
+        background-color: #002B49 !important;
+        border: 1px solid #002B49 !important;
+        border-radius: 10px !important;
+        min-height: 42px !important;
+    }}
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child > div {{
+        color: #FFFFFF !important;
+    }}
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child span {{
+        color: #FFFFFF !important;
+    }}
+    
+    .stSelectbox div[data-baseweb="select"] > div:first-child svg {{
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
+    }}
+    
+    /* Open dropdown */
+    [data-testid="stVirtualDropdown"] {{
         background-color: #FFFFFF !important;
     }}
     
-    ul[role="listbox"] {{
-        background-color: #FFFFFF !important;
-    }}
-    
-    li[role="option"] {{
+    [data-testid="stVirtualDropdown"] li {{
         background-color: #FFFFFF !important;
         color: #002B49 !important;
     }}
     
-    li[role="option"]:hover {{
+    [data-testid="stVirtualDropdown"] li:hover {{
         background-color: #EEF2F6 !important;
+        color: #002B49 !important;
     }}
     
         </style>
